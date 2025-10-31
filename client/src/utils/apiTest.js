@@ -1,5 +1,5 @@
 // API Test Utility for Browser environment
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://smartchef-2025.onrender.com/api';
 
 const testAPI = {
   async testConnection() {

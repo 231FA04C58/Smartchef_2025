@@ -11,6 +11,7 @@ const recipeRoutes = require('./routes/recipes');
 const userRoutes = require('./routes/users');
 const plannerRoutes = require('./routes/planner');
 const collectionRoutes = require('./routes/collections');
+import axios from 'axios';
 
 const app = express();
 
@@ -131,3 +132,12 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
+const baseURL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com';
+
+const api = axios.create({
+  baseURL,
+  withCredentials: true
+});
+
+export default api;

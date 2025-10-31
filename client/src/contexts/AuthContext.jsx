@@ -15,8 +15,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Use environment variable or default to localhost for development
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  // Use environment variable or default to Render URL
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com/api'
 
   useEffect(() => {
     // Check for existing user in localStorage
