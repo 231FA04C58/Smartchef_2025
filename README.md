@@ -1,166 +1,185 @@
-# SmartChef - React Recipe Finder & Meal Planner
+# SmartChef - Full Stack Recipe Finder and Meal Planner
 
-A modern, fully-featured React application for discovering recipes, planning meals, and generating shopping lists. This project was converted from a static HTML/CSS/JavaScript site to a dynamic React application with routing, context management, and interactive features.
+A complete full-stack application for recipe discovery, meal planning, and cooking management.
 
-## Features
+## ✅ **FIXED ISSUES**
 
-- 🔐 **Authentication System** - Login/Signup with persistent sessions
-- 🌙 **Dark Mode** - Toggle between light and dark themes
-- 🍽️ **Recipe Discovery** - Browse and view detailed recipes
-- 📅 **Meal Planner** - Drag-and-drop weekly meal planning
-- 🛒 **Shopping List** - Auto-generated from your meal plan
-- 🤖 **AI Recipe Generator** - Mock AI-powered recipe suggestions
-- 📱 **Responsive Design** - Works seamlessly on all devices
-
-## Tech Stack
-
-- **React 18** - Modern React with hooks
-- **React Router 6** - Client-side routing
-- **Vite** - Fast build tool and dev server
-- **Context API** - State management for auth, dark mode, and planner
-- **CSS Variables** - Dynamic theming
-- **Font Awesome** - Icon library
+- **Email validation** - Now accepts all valid email formats
+- **Password requirements** - Simplified to just 6+ characters  
+- **Browser compatibility** - Fixed node-fetch issues
+- **Login errors** - Fixed `_id` property access issues
+- **File cleanup** - Removed duplicate and unnecessary files
+- **Port configuration** - Frontend (5173) and Backend (5000)
 
 ## Project Structure
 
 ```
-smartchef-react/
-├── src/
-│   ├── components/
-│   │   ├── AIGenerator.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Header.jsx
-│   │   ├── Layout.jsx
-│   │   └── ProtectedRoute.jsx
-│   ├── contexts/
-│   │   ├── AuthContext.jsx
-│   │   ├── DarkModeContext.jsx
-│   │   └── PlannerContext.jsx
-│   ├── pages/
-│   │   ├── About.jsx
-│   │   ├── Home.jsx
-│   │   ├── Login.jsx
-│   │   ├── Planner.jsx
-│   │   └── RecipeDetail.jsx
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-├── index-old.html
-├── package.json
-├── vite.config.js
-└── README.md
+msd-project2/
+├── client/          # React frontend
+├── backend/         # Node.js/Express backend
+└── package.json     # Root package.json for managing both
 ```
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
-
-- Node.js (version 16 or higher)
-- npm or yarn
+- Node.js (v16 or higher)
+- MongoDB (local or cloud instance)
 
 ### Installation
 
-1. Clone the repository or navigate to the project directory:
+1. Install all dependencies:
 ```bash
-cd "msd project2"
+npm run install:all
 ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+### Running the Application
 
-3. Start the development server:
+#### Development Mode (Recommended)
+Run both frontend and backend simultaneously:
 ```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to:
-```
-http://localhost:3000
+This will start:
+- Backend server on http://localhost:5000
+- Frontend development server on http://localhost:5173
+
+#### Individual Services
+
+**Backend only:**
+```bash
+npm run dev:backend
 ```
 
-### Build for Production
+**Frontend only:**
+```bash
+npm run dev:client
+```
 
-To create a production build:
+### Production Build
 
 ```bash
 npm run build
+npm start
 ```
 
-To preview the production build:
+## Features
 
+- 🔐 User Authentication (Login/Register)
+- 📧 Password Reset with OTP
+- 🍳 Recipe Discovery and Management
+- 📅 Meal Planning
+- ⭐ Favorites System
+- 🛒 Shopping List Generation
+- 🤖 AI Recipe Generator (Coming Soon)
+
+## API Testing
+
+Open browser console and use:
+```javascript
+// Test API connection
+testAPI.testConnection()
+
+// Test login
+testAPI.testLogin("email@example.com", "password")
+
+// Test forgot password
+testAPI.testForgotPassword("email@example.com")
+
+// Run comprehensive tests
+testSmartChef.runTests()
+```
+
+## Environment Setup
+
+### Backend Environment Variables
+Create a `.env` file in the `backend/` directory:
+
+```env
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/smartchef
+JWT_SECRET=your_jwt_secret_here
+FRONTEND_URL=http://localhost:5173
+
+# Email Configuration (Optional)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+
+# Google Custom Search API (Optional - for recipe images)
+GOOGLE_SEARCH_API_KEY=your_google_api_key_here
+GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id_here
+```
+
+### Setting Up Google Images for Recipes
+
+To enable Google Images for your recipes:
+
+1. **Get Google API Credentials**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a project and enable "Custom Search API"
+   - Create an API key
+   - Set up a [Custom Search Engine](https://programmablesearchengine.google.com/)
+   - Get your Search Engine ID
+
+2. **Update `.env` file** with your credentials:
+   ```env
+   GOOGLE_SEARCH_API_KEY=your_api_key
+   GOOGLE_SEARCH_ENGINE_ID=your_engine_id
+   ```
+
+3. **Update your recipes**:
+   ```bash
+   cd backend
+   node update-recipe-images.js
+   ```
+
+For detailed instructions, see [README-GOOGLE-IMAGES.md](README-GOOGLE-IMAGES.md)
+
+## Troubleshooting
+
+### Port Already in Use
+If you get "EADDRINUSE" error:
 ```bash
-npm run preview
+# Kill process on port 5000
+npx kill-port 5000
+
+# Or change port in backend/server.js
 ```
 
-## Usage
+### CORS Issues
+The backend is configured to accept requests from:
+- http://localhost:5173 (default frontend)
+- http://localhost:5174
+- http://localhost:5175
+- http://localhost:3000
 
-### Authentication
+### Database Connection
+Make sure MongoDB is running:
+```bash
+# Start MongoDB (if installed locally)
+mongod
+```
 
-1. Visit the app and you'll be redirected to the login page
-2. Create an account or login with any email/password
-3. Your session will be saved in localStorage
+## Development Notes
 
-### Meal Planning
+- Frontend uses Vite for fast development
+- Backend uses Express with MongoDB
+- Authentication uses JWT tokens
+- Password reset uses OTP via email
+- All API endpoints are prefixed with `/api`
 
-1. Navigate to the "Meal Planner" page
-2. Drag recipes from the left sidebar to specific days
-3. Click "Generate Shopping List" to see all required ingredients
-4. Use "Clear Plan" to start over
+## Contributing
 
-### Dark Mode
-
-Click the moon/sun icon in the header to toggle between light and dark themes. Your preference is saved automatically.
-
-### AI Recipe Generator
-
-1. On the home page, scroll to the "AI Recipe Generator" section
-2. Enter ingredients you have (comma-separated)
-3. Click "Generate Recipe" to get a mock AI-generated recipe
-
-## Key Features Explained
-
-### Context Providers
-
-- **AuthContext**: Manages user authentication state and localStorage persistence
-- **DarkModeContext**: Handles theme switching and saves preference
-- **PlannerContext**: Manages meal plan state, shopping list generation, and recipe data
-
-### Protected Routes
-
-Pages like Home, About, Planner, and Recipe Details are protected and require authentication. Unauthenticated users are redirected to the login page.
-
-### Drag and Drop
-
-The meal planner uses HTML5 drag and drop API to allow intuitive recipe placement on specific days of the week.
-
-## Original Project Files
-
-The original HTML, CSS, and JavaScript files are preserved in the project directory:
-- `index.html`, `about.html`, `login.html`, `planner.html`, `recipe1-5.html`
-- `styles.css`
-- `script.js`
-
-These can be used as reference but are not used in the React application.
-
-## Future Enhancements
-
-- Integration with a real recipe API
-- User profile and favorites
-- Export meal plans as PDF
-- Social sharing features
-- Recipe ratings and reviews
-- Nutritional information
-- Dietary preference filtering
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## License
 
-This project is for educational purposes. Feel free to use and modify as needed.
-
-## Acknowledgments
-
-- Images from Unsplash and Bing
-- Icons from Font Awesome
-- Built with React and Vite
-
+MIT License - see LICENSE file for details
