@@ -26,24 +26,41 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
-const allowedOrigins = process.env.FRONTEND_URL 
-  ? [process.env.FRONTEND_URL]
-  : process.env.NODE_ENV === 'production'
-  ? [] // Production should only allow specific origins
-  : [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:3000'
-    ];
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const allowedOrigins = [];
+
+// Add production frontend URL if set
+if (process.env.FRONTEND_URL) {
+  // Support comma-separated multiple URLs
+  const urls = process.env.FRONTEND_URL.split(',').map(url => url.trim());
+  allowedOrigins.push(...urls);
+}
+
+// Add localhost origins for development
+if (isDevelopment) {
+  allowedOrigins.push(
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://localhost:3000'
+  );
+}
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin (like mobile apps, Postman, or curl requests)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.length === 0) {
+    
+    // In development, allow all origins for easier testing
+    if (isDevelopment && allowedOrigins.length === 0) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -102,7 +119,10 @@ app.use('*', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// Server port configuration
+// Default to 5000 for development, use PORT env variable for production
+const DEFAULT_PORT = 5000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
