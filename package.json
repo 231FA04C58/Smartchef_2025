@@ -1,38 +1,30 @@
 {
-  "name": "smartchef-react",
-  "homepage": "https://231fa04c58.github.io/MSD--PROJECT-/",
+  "name": "smartchef-fullstack",
   "version": "1.0.0",
-  "description": "SmartChef - Intelligent Recipe Finder and Meal Planner Platform",
+  "description": "SmartChef - Full Stack Recipe Finder and Meal Planner Platform",
   "private": true,
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "@fortawesome/fontawesome-free": "^6.4.0"
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:client\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:client\"",
+    "start:backend": "cd backend && npm start",
+    "start:client": "cd client && npm run build && npm run preview",
+    "install:all": "npm install && cd backend && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "test:api": "cd backend && node ../client/src/utils/apiTest.js"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.8"
+    "concurrently": "^8.2.2"
   },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d build"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "keywords": [
+    "recipe",
+    "cooking",
+    "meal-planner",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "SmartChef Team",
+  "license": "MIT"
 }
-
-

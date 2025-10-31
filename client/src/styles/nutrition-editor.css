@@ -1,0 +1,303 @@
+/* Nutrition Editor Styles */
+.nutrition-editor {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 1rem;
+  border: 2px solid var(--primary);
+}
+
+.nutrition-editor-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.nutrition-editor-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.nutrition-editor-header p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.nutrition-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.nutrition-form-section {
+  background: var(--bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.nutrition-form-section h4 {
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.nutrition-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.nutrition-form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nutrition-form-item label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nutrition-form-item label i {
+  color: var(--primary);
+}
+
+.nutrition-form-item input {
+  padding: 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.nutrition-form-item input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.1);
+}
+
+.nutrition-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border);
+}
+
+.nutrition-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.no-nutrition {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.no-nutrition i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+  color: var(--primary);
+}
+
+.no-nutrition p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.nutrition-section .nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.nutrition-item {
+  background: var(--bg);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.nutrition-item:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nutrition-label {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nutrition-label i {
+  margin-right: 0.25rem;
+  color: var(--primary);
+}
+
+.nutrition-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Review Form Enhancements */
+.review-form {
+  background: var(--bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 2px solid var(--border);
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rating-input span {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.star-rating {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.star-rating .fas.fa-star {
+  font-size: 1.5rem;
+  color: #ddd;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.star-rating .fas.fa-star:hover {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.star-rating .fas.fa-star.filled {
+  color: #ffc107;
+}
+
+.review-form textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+  margin-bottom: 1rem;
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.review-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.1);
+}
+
+.review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.review-item {
+  background: var(--bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.reviewer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.review-rating {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.review-rating .fas.fa-star {
+  font-size: 0.875rem;
+  color: #ffc107;
+}
+
+.review-date {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.review-comment {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nutrition-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nutrition-section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nutrition-section-header .btn {
+    width: 100%;
+  }
+}
+
