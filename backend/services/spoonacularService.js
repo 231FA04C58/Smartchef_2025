@@ -14,11 +14,13 @@ const API_BASE_URL = 'https://api.spoonacular.com/recipes';
 const makeRequest = async (endpoint, params = {}) => {
   try {
     // Use provided API key or env variable
-    const apiKey = process.env.SPOONACULAR_API_KEY || '64c2bd730b08413a89cf5d66bdc670d1';
+    const apiKey = process.env.SPOONACULAR_API_KEY || '11dc1a589df84e97a1c939582e3d515b';
     
     if (!apiKey) {
       throw new Error('SPOONACULAR_API_KEY is not set');
     }
+    
+    console.log('🔑 Using Spoonacular API Key:', apiKey.substring(0, 8) + '...');
     
     const queryParams = new URLSearchParams({
       ...params,

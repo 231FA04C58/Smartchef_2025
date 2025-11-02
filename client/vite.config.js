@@ -7,5 +7,12 @@ export default defineConfig({
     port: 5173,
     open: true,
     host: true
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  },
+  esbuild: {
+    target: 'es2015',
+    format: 'esm'
   }
 })

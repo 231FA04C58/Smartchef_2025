@@ -40,12 +40,60 @@ const Recipes = () => {
       
       console.log('🔍 Loading recipes with params:', params)
       const response = await getRecipes(params)
+      console.log('📦 Full API Response:', response)
+      console.log('📦 Response Type:', typeof response)
+      console.log('📦 Response Keys:', Object.keys(response))
+      console.log('📦 Response.success:', response.success)
+      console.log('📦 Response.data:', response.data)
       
       if (response.success) {
-        setRecipes(response.data.recipes)
-        setTotalPages(response.data.totalPages || 1)
-        console.log(`✅ Loaded ${response.data.recipes.length} recipes`)
+        // ✅ CORRECT: Access recipes from response.data.recipes (matches backend structure)
+        const recipes = response.data?.recipes || response.recipes || [];
+        const totalPages = response.data?.pagination?.totalPages || response.data?.totalPages || response.pagination?.totalPages || 1;
+        
+        console.log(`✅ Loaded ${recipes.length} recipes`)
+        console.log('📄 Recipes array type:', Array.isArray(recipes))
+        console.log('📄 Recipes data:', recipes)
+        console.log('📄 First recipe sample:', recipes[0])
+        console.log('📄 Pagination data:', response.data?.pagination || response.pagination)
+        
+        // Verify we're accessing the correct path
+        if (!recipes || recipes.length === 0) {
+          console.warn('⚠️ API returned success but recipes array is EMPTY')
+          console.warn('📋 Checking response structure...')
+          console.warn('   - response.success:', response.success)
+          console.warn('   - response.data:', response.data)
+          console.warn('   - response.data?.recipes:', response.data?.recipes)
+          console.warn('   - response.recipes:', response.recipes)
+          console.warn('📋 Full response structure:', JSON.stringify(response, null, 2))
+          
+          // Try to diagnose why it's empty
+          if (response.data?.pagination?.totalRecipes === 0) {
+            console.warn('⚠️ Backend reports 0 total recipes in database')
+            console.warn('💡 Backend needs to be restarted after fixing .env file!')
+            console.warn('💡 Run: cd backend && npm start (restart backend)')
+          }
+        } else {
+          console.log('✅ Recipes found! First recipe title:', recipes[0].title)
+          console.log('✅ First recipe ID:', recipes[0]._id)
+          console.log('✅ First recipe image:', recipes[0].images?.[0]?.url)
+        }
+        
+        setRecipes(recipes)
+        setTotalPages(totalPages)
+        
+        if (recipes.length === 0) {
+          console.warn('⚠️ API returned success but no recipes found. Possible causes:')
+          console.warn('   1. Backend not restarted after .env fix (CRITICAL!)')
+          console.warn('   2. Database is empty - no recipes imported yet')
+          console.warn('   3. All recipes are private (isPublic: false)')
+          console.warn('   4. Filter criteria too restrictive')
+          console.warn('   5. Backend connecting to wrong database (localhost vs Atlas)')
+          console.warn('')
+          console.warn('🔧 Quick fix: Restart your backend server!')
+        }
       } else {
+        console.error('❌ API returned error:', response)
         setError(response.message || 'Failed to load recipes')
       }
     } catch (err) {

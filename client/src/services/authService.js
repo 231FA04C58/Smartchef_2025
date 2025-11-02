@@ -1,4 +1,4 @@
-// API service functions for OTP authentication
+// API service functions for authentication (simplified - no OTP)
 import { API_BASE_URL } from '../config/api';
 
 // Helper function to handle API responses
@@ -18,7 +18,7 @@ const handleApiResponse = async (response) => {
   return response.json();
 };
 
-// Forgot Password - Send OTP
+// Forgot Password - Check if email exists (no OTP)
 export const forgotPassword = async (email) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
@@ -39,36 +39,15 @@ export const forgotPassword = async (email) => {
   }
 };
 
-// Verify OTP
-export const verifyOTP = async (email, otp, type = 'password-reset') => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, otp, type }),
-    });
-
-    return await handleApiResponse(response);
-  } catch (error) {
-    console.error('Verify OTP error:', error);
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      throw new Error('Unable to connect to server. Please check if the backend is running.');
-    }
-    throw error;
-  }
-};
-
-// Reset Password
-export const resetPassword = async (email, newPassword, otp) => {
+// Reset Password - Update password with new + confirm (no OTP)
+export const resetPassword = async (email, newPassword, confirmPassword) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, newPassword, otp }),
+      body: JSON.stringify({ email, newPassword, confirmPassword }),
     });
 
     return await handleApiResponse(response);
@@ -81,23 +60,3 @@ export const resetPassword = async (email, newPassword, otp) => {
   }
 };
 
-// Resend OTP
-export const resendOTP = async (email, type = 'password-reset') => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, type }),
-    });
-
-    return await handleApiResponse(response);
-  } catch (error) {
-    console.error('Resend OTP error:', error);
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      throw new Error('Unable to connect to server. Please check if the backend is running.');
-    }
-    throw error;
-  }
-};

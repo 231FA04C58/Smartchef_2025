@@ -57,6 +57,20 @@ const dbConnection = require('./config/database');
 
 // Connect to database
 dbConnection.connect()
+  .then(() => {
+    // Verify connection and count recipes
+    const Recipe = require('./models/Recipe');
+    Recipe.countDocuments({})
+      .then(count => {
+        console.log(`📊 Total recipes in database: ${count}`);
+        if (count === 0) {
+          console.log('⚠️  Database is empty - use /api/recipes/seed to import recipes');
+        }
+      })
+      .catch(err => {
+        console.log('⚠️  Could not count recipes:', err.message);
+      });
+  })
   .catch((error) => {
     console.error('❌ Failed to connect to database:', error);
     process.exit(1);
@@ -77,6 +91,47 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
+});
+
+// Test recipes endpoint - returns recipe count and sample
+app.get('/api/test-recipes', async (req, res) => {
+  try {
+    const Recipe = require('./models/Recipe');
+    const mongoose = require('mongoose');
+    
+    const totalCount = await Recipe.countDocuments({});
+    const publicCount = await Recipe.countDocuments({ isPublic: true });
+    const privateCount = await Recipe.countDocuments({ $or: [{ isPublic: false }, { isPublic: { $exists: false } }] });
+    
+    const sampleRecipes = await Recipe.find({})
+      .limit(3)
+      .select('title cuisine category images isPublic createdAt')
+      .lean();
+    
+    res.json({
+      success: true,
+      message: 'Recipe database test',
+      data: {
+        totalRecipes: totalCount,
+        publicRecipes: publicCount,
+        privateRecipes: privateCount,
+        sampleRecipes: sampleRecipes,
+        connection: {
+          connected: mongoose.connection.readyState === 1,
+          databaseName: mongoose.connection.db?.databaseName || 'unknown',
+          mongoUri: process.env.MONGODB_URI ? 
+            process.env.MONGODB_URI.replace(/:([^:@]+)@/, ':****@') : 
+            'not set (using default: localhost)'
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Test failed',
+      error: error.message
+    });
+  }
 });
 
 // Error handling middleware

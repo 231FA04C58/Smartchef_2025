@@ -11,12 +11,13 @@ const router = express.Router();
 // @access  Private
 router.get('/', authenticateToken, [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 20 }).withMessage('Limit must be between 1 and 20'),
-  query('active').optional().isBoolean().withMessage('Active filter must be boolean')
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  query('active').optional().isIn(['true', 'false', '1', '0']).withMessage('Active filter must be true, false, 1, or 0')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.error('⚠️ Meal planner validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -25,13 +26,15 @@ router.get('/', authenticateToken, [
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = Math.min(parseInt(req.query.limit) || 10, 100); // Cap at 100
     const skip = (page - 1) * limit;
 
     const filter = { user: req.user._id };
     
     if (req.query.active !== undefined) {
-      filter.isActive = req.query.active === 'true';
+      // Handle both string and boolean values
+      const activeValue = req.query.active;
+      filter.isActive = activeValue === 'true' || activeValue === true || activeValue === '1' || activeValue === 1;
     }
 
     const mealPlans = await MealPlan.find(filter)

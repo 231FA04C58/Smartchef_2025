@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { forgotPassword, resetPassword } from '../services/otpService';
+import { forgotPassword, resetPassword } from '../services/authService';
+import { useToast } from '../contexts/ToastContext';
 
-const ForgotPassword = ({ onBack, onOTPSent }) => {
+const ForgotPassword = ({ onBack, onSuccess }) => {
+  const [step, setStep] = useState('email'); // 'email' or 'reset'
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const { success, error: showError } = useToast();
 
-  const handleSendOTP = async (e) => {
+  // Step 1: Enter email
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -19,28 +21,32 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
 
     try {
       const response = await forgotPassword(email);
-      setMessage(response.message || 'OTP sent! Check your email.');
-      setOtpSent(true);
-      onOTPSent(email);
-    } catch (error) {
-      console.error('Forgot password error details:', error);
-      let errorMessage = error.message || 'Failed to send OTP. Please try again.';
-      
-      // Add detailed error if available in development
-      if (error.details) {
-        errorMessage += ` Details: ${error.details}`;
+      if (response.success) {
+        setMessage('User found. You can now reset your password.');
+        setStep('reset');
+      } else {
+        setError(response.message || 'Email not found');
       }
-      
-      setError(errorMessage);
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      setError(error.message || 'Failed to check email. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResetPassword = async (e) => {
+  // Step 2: Reset password
+  const handleResetSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validation
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
@@ -48,23 +54,17 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await resetPassword(email, newPassword, otp);
+      const response = await resetPassword(email, newPassword, confirmPassword);
       if (response.success) {
-        setMessage('Password reset successfully!');
-        setTimeout(() => {
-          onBack();
-        }, 2000);
+        success('Password reset successfully! You can now login with your new password.');
+        if (onSuccess) onSuccess();
+      } else {
+        setError(response.message || 'Failed to reset password');
       }
     } catch (error) {
       console.error('Reset password error:', error);
-      setError(error.message || 'Failed to reset password. Please check your OTP.');
+      setError(error.message || 'Failed to reset password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -73,16 +73,16 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
   return (
     <div className="forgot-password-form">
       <div className="form-header">
-        <h2>Forgot Password?</h2>
-        {!otpSent ? (
-          <p>Enter your email address and we'll send you an OTP.</p>
+        <h2>Reset Password</h2>
+        {step === 'email' ? (
+          <p>Enter your email address to reset your password</p>
         ) : (
-          <p>Enter the OTP you received and your new password.</p>
+          <p>Enter your new password</p>
         )}
       </div>
 
-      {!otpSent ? (
-        <form onSubmit={handleSendOTP}>
+      {step === 'email' ? (
+        <form onSubmit={handleEmailSubmit}>
           <div className="input-group">
             <input
               type="email"
@@ -91,6 +91,7 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              autoFocus
             />
           </div>
 
@@ -116,12 +117,12 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
             {loading ? (
               <>
                 <i className="fas fa-spinner fa-spin"></i>
-                Sending...
+                Checking...
               </>
             ) : (
               <>
-                <i className="fas fa-paper-plane"></i>
-                Send OTP
+                <i className="fas fa-arrow-right"></i>
+                Continue
               </>
             )}
           </button>
@@ -137,19 +138,7 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
           </button>
         </form>
       ) : (
-        <form onSubmit={handleResetPassword}>
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Enter OTP (6 digits)"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              required
-              disabled={loading}
-              maxLength={6}
-            />
-          </div>
-
+        <form onSubmit={handleResetSubmit}>
           <div className="input-group">
             <input
               type="password"
@@ -158,7 +147,10 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
               onChange={(e) => setNewPassword(e.target.value)}
               required
               disabled={loading}
+              minLength={6}
+              autoFocus
             />
+            <small className="input-hint">Password must be at least 6 characters</small>
           </div>
 
           <div className="input-group">
@@ -169,15 +161,15 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={loading}
+              minLength={6}
             />
+            {confirmPassword && newPassword !== confirmPassword && (
+              <small className="error-text">Passwords do not match</small>
+            )}
+            {confirmPassword && newPassword === confirmPassword && (
+              <small className="success-text">Passwords match</small>
+            )}
           </div>
-
-          {message && (
-            <div className="success-message">
-              <i className="fas fa-check-circle"></i>
-              {message}
-            </div>
-          )}
 
           {error && (
             <div className="error-message">
@@ -189,7 +181,7 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
           <button 
             type="submit" 
             className="btn primary full-width"
-            disabled={loading || !otp || !newPassword || !confirmPassword}
+            disabled={loading || !newPassword || !confirmPassword || newPassword !== confirmPassword}
           >
             {loading ? (
               <>
@@ -208,11 +200,9 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
             type="button" 
             className="btn secondary full-width"
             onClick={() => {
-              setOtpSent(false);
-              setOtp('');
+              setStep('email');
               setNewPassword('');
               setConfirmPassword('');
-              setMessage('');
               setError('');
             }}
             disabled={loading}
@@ -222,17 +212,9 @@ const ForgotPassword = ({ onBack, onOTPSent }) => {
           </button>
         </form>
       )}
-
-      {!otpSent && (
-        <div className="help-text">
-          <p>
-            <i className="fas fa-info-circle"></i>
-            The OTP will expire in 10 minutes. Check your spam folder if you don't see the email.
-          </p>
-        </div>
-      )}
     </div>
   );
 };
 
 export default ForgotPassword;
+

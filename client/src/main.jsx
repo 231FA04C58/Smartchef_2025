@@ -9,7 +9,6 @@ import './styles/ai-generator.css'
 import './styles/nutrition-editor.css'
 import './styles/profile-dashboard.css'
 import './styles/home-page.css'
-import './utils/apiTest.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import ForgotPassword from '../components/ForgotPassword'
-import OTPVerification from '../components/OTPVerification'
-import ResetPassword from '../components/ResetPassword'
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState('login')
@@ -14,9 +12,7 @@ const Login = () => {
   const [signupPassword, setSignupPassword] = useState('')
   const [loginEmailError, setLoginEmailError] = useState(false)
   const [signupEmailError, setSignupEmailError] = useState(false)
-  const [forgotPasswordStep, setForgotPasswordStep] = useState(null) // null, 'email', 'otp', 'reset'
-  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
-  const [resetToken, setResetToken] = useState('')
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   
   const { login, signup, loading, error, clearError, setError } = useAuth()
   const navigate = useNavigate()
@@ -76,34 +72,16 @@ const Login = () => {
 
   // Forgot password handlers
   const handleForgotPassword = () => {
-    setForgotPasswordStep('email')
-    setForgotPasswordEmail('')
-    setResetToken('')
-  }
-
-  const handleOTPSent = (email) => {
-    // OTP sent, but don't auto-close - let user enter OTP and password
-    // The ForgotPassword component now handles everything in one view
-  }
-
-  const handleOTPVerified = (token) => {
-    setResetToken(token)
-    setForgotPasswordStep('reset')
+    setShowForgotPassword(true)
   }
 
   const handlePasswordResetSuccess = () => {
-    setForgotPasswordStep(null)
-    setForgotPasswordEmail('')
-    setResetToken('')
-    // Show success message and redirect to login
-    alert('Password reset successfully! Please login with your new password.')
+    setShowForgotPassword(false)
     setActiveTab('login')
   }
 
   const handleBackToLogin = () => {
-    setForgotPasswordStep(null)
-    setForgotPasswordEmail('')
-    setResetToken('')
+    setShowForgotPassword(false)
   }
 
   return (
@@ -253,28 +231,11 @@ const Login = () => {
           </p>
         </form>
 
-        {/* Forgot Password Components */}
-        {forgotPasswordStep === 'email' && (
+        {/* Forgot Password Component */}
+        {showForgotPassword && (
           <ForgotPassword 
             onBack={handleBackToLogin}
-            onOTPSent={handleOTPSent}
-          />
-        )}
-
-        {forgotPasswordStep === 'otp' && (
-          <OTPVerification 
-            email={forgotPasswordEmail}
-            onVerified={handleOTPVerified}
-            onBack={() => setForgotPasswordStep('email')}
-          />
-        )}
-
-        {forgotPasswordStep === 'reset' && (
-          <ResetPassword 
-            email={forgotPasswordEmail}
-            resetToken={resetToken}
             onSuccess={handlePasswordResetSuccess}
-            onBack={() => setForgotPasswordStep('otp')}
           />
         )}
       </div>

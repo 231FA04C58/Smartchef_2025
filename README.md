@@ -101,6 +101,9 @@ EMAIL_PORT=587
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password
 
+# Spoonacular API (Optional - for recipe import/seeding)
+SPOONACULAR_API_KEY=11dc1a589df84e97a1c939582e3d515b
+
 # Google Custom Search API (Optional - for recipe images)
 GOOGLE_SEARCH_API_KEY=your_google_api_key_here
 GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id_here
@@ -130,6 +133,31 @@ To enable Google Images for your recipes:
    ```
 
 For detailed instructions, see [README-GOOGLE-IMAGES.md](README-GOOGLE-IMAGES.md)
+
+### Setting Up Spoonacular API for Recipe Import
+
+To enable recipe import from Spoonacular:
+
+1. **Get Spoonacular API Key**:
+   - Go to [Spoonacular Food API](https://spoonacular.com/food-api)
+   - Sign up for a free account (150 requests/day)
+   - Get your API key
+
+2. **Update `.env` file** with your API key:
+   ```env
+   SPOONACULAR_API_KEY=11dc1a589df84e97a1c939582e3d515b
+   ```
+
+3. **Seed recipes from Spoonacular**:
+   ```bash
+   # Using the seed endpoint (GET or POST)
+   curl https://your-backend-url.onrender.com/api/recipes/seed?count=20
+   
+   # Or visit in browser:
+   https://your-backend-url.onrender.com/api/recipes/seed?count=20
+   ```
+
+This will import random recipes from Spoonacular with full details including images, ingredients, instructions, and nutrition info.
 
 ## Troubleshooting
 

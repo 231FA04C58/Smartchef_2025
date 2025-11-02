@@ -33,25 +33,16 @@ router.get('/', [
     const limit = parseInt(req.query.limit) || 12;
     const skip = (page - 1) * limit;
 
-    // Build filter object
-    // Include recipes that are public OR don't have isPublic field (treat as public by default)
-    const baseFilter = {
-      $or: [
-        { isPublic: true },
-        { isPublic: { $exists: false } }
-      ]
-    };
-    
-    const filter = { ...baseFilter };
+    // Build filter object - get ALL recipes (no isPublic filter)
+    const filter = {};
     
     if (req.query.search) {
-      // Combine text search with public filter
-      filter.$and = [
-        baseFilter,
-        { $text: { $search: req.query.search } }
+      // Use regex search instead of $text for more reliable results
+      filter.$or = [
+        { title: new RegExp(req.query.search, 'i') },
+        { description: new RegExp(req.query.search, 'i') },
+        { tags: { $in: [new RegExp(req.query.search, 'i')] } }
       ];
-      delete filter.$or;
-      delete filter.$text;
     }
     
     if (req.query.cuisine) {
@@ -97,16 +88,47 @@ router.get('/', [
       sort = { createdAt: -1 };
     }
 
-    const recipes = await Recipe.find(filter)
+    // Use empty filter {} to get all recipes if no filters applied
+    const queryFilter = Object.keys(filter).length > 0 ? filter : {};
+    
+    console.log('🔍 Recipe query filter:', JSON.stringify(queryFilter, null, 2));
+    console.log('📋 Query params:', JSON.stringify(req.query));
+    
+    // First, check total count without filters
+    const totalInDB = await Recipe.countDocuments({});
+    console.log(`📊 Total recipes in database (no filter): ${totalInDB}`);
+    
+    // Check count with filter
+    const totalWithFilter = await Recipe.countDocuments(queryFilter);
+    console.log(`📊 Total recipes matching filter: ${totalWithFilter}`);
+    
+    const recipes = await Recipe.find(queryFilter)
       .populate('author', 'username firstName lastName')
       .sort(sort)
       .skip(skip)
       .limit(limit)
       .select('-instructions'); // Exclude detailed instructions for list view
 
-    const total = await Recipe.countDocuments(filter);
+    const total = await Recipe.countDocuments(queryFilter);
+    
+    console.log(`📊 Found ${total} total recipes matching filter`);
+    console.log(`📦 Returning ${recipes.length} recipes (page ${page}, limit ${limit})`);
+    console.log(`🔍 Sample recipe titles:`, recipes.slice(0, 3).map(r => r?.title || 'NO TITLE'));
+    
+    // Log detailed info about first recipe
+    if (recipes.length > 0) {
+      const firstRecipe = recipes[0];
+      console.log('📄 First recipe details:');
+      console.log('   - ID:', firstRecipe._id);
+      console.log('   - Title:', firstRecipe.title);
+      console.log('   - isPublic:', firstRecipe.isPublic);
+      console.log('   - Has images:', !!firstRecipe.images?.length);
+      console.log('   - Image URL:', firstRecipe.images?.[0]?.url);
+      console.log('   - Cuisine:', firstRecipe.cuisine);
+      console.log('   - Category:', firstRecipe.category);
+    }
 
-    res.json({
+    const responseData = {
       success: true,
       data: {
         recipes,
@@ -118,7 +140,17 @@ router.get('/', [
           hasPrev: page > 1
         }
       }
+    };
+    
+    console.log('📤 Sending response with', responseData.data.recipes.length, 'recipes');
+    console.log('📤 Response structure:', {
+      success: responseData.success,
+      hasData: !!responseData.data,
+      recipesCount: responseData.data.recipes.length,
+      pagination: responseData.data.pagination
     });
+
+    res.json(responseData);
 
   } catch (error) {
     console.error('Get recipes error:', error);
@@ -721,5 +753,158 @@ router.post('/spoonacular/import', [
     });
   }
 });
+
+// Helper function to seed recipes (used by both GET and POST)
+const seedRecipesHandler = async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const { getRandomRecipes, convertToRecipeSchema } = require('../services/spoonacularService');
+    
+    // API key is available via fallback in spoonacularService
+    const apiKey = process.env.SPOONACULAR_API_KEY || '11dc1a589df84e97a1c939582e3d515b';
+    
+    if (!apiKey) {
+      return res.status(503).json({
+        success: false,
+        message: 'Spoonacular API key not configured. Please set SPOONACULAR_API_KEY in environment variables.'
+      });
+    }
+
+    // Support both GET (query params) and POST (body)
+    const count = parseInt(req.body?.count || req.query?.count || 20); // Number of recipes to import (default 20)
+
+    console.log('🌱 Starting recipe seed...');
+    console.log(`📊 Requesting ${count} random recipes from Spoonacular`);
+
+    // Find or create admin user for seeding
+    let adminUser = await User.findOne({ email: 'admin@smartchef.com' });
+    if (!adminUser) {
+      console.log('👤 Creating admin user for seeded recipes...');
+      adminUser = new User({
+        username: 'smartchef_admin',
+        email: 'admin@smartchef.com',
+        password: 'admin123456', // Default password - should be changed
+        firstName: 'SmartChef',
+        lastName: 'Admin',
+        isActive: true
+      });
+      await adminUser.save();
+      console.log('✅ Admin user created');
+    } else {
+      console.log('✅ Using existing admin user');
+    }
+
+    // Fetch random recipes from Spoonacular
+    console.log('🔍 Fetching recipes from Spoonacular...');
+    const spoonRecipes = await getRandomRecipes(Math.min(count, 50), ''); // Max 50 at once
+
+    if (!spoonRecipes || spoonRecipes.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch recipes from Spoonacular'
+      });
+    }
+
+    console.log(`✅ Fetched ${spoonRecipes.length} recipes from Spoonacular`);
+
+    // Import each recipe
+    const imported = [];
+    const skipped = [];
+    let errors = [];
+
+    for (const spoonRecipe of spoonRecipes) {
+      try {
+        // Check if recipe already exists
+        const existing = await Recipe.findOne({ 
+          $or: [
+            { spoonacularId: spoonRecipe.id?.toString() },
+            { title: spoonRecipe.title }
+          ]
+        });
+
+        if (existing) {
+          skipped.push({
+            title: spoonRecipe.title,
+            reason: 'Already exists'
+          });
+          continue;
+        }
+
+        // Get full recipe details
+        const fullRecipe = await require('../services/spoonacularService').getRecipeById(spoonRecipe.id);
+        
+        // Convert to our schema
+        const recipeData = convertToRecipeSchema(fullRecipe, adminUser._id);
+        
+        // Ensure it's public
+        recipeData.isPublic = true;
+        
+        // Save to database
+        const savedRecipe = await Recipe.create(recipeData);
+        
+        imported.push({
+          id: savedRecipe._id,
+          title: savedRecipe.title,
+          cuisine: savedRecipe.cuisine,
+          category: savedRecipe.category
+        });
+
+        console.log(`✅ Imported: ${savedRecipe.title}`);
+
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+      } catch (error) {
+        console.error(`❌ Error importing recipe ${spoonRecipe.title}:`, error.message);
+        errors.push({
+          title: spoonRecipe.title || 'Unknown',
+          error: error.message
+        });
+      }
+    }
+
+    const totalRecipes = await Recipe.countDocuments();
+
+    console.log('🎉 Recipe seeding completed!');
+    console.log(`📊 Total recipes in database: ${totalRecipes}`);
+    console.log(`✅ Successfully imported: ${imported.length}`);
+    console.log(`⏭️  Skipped (already exist): ${skipped.length}`);
+    console.log(`❌ Errors: ${errors.length}`);
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully seeded ${imported.length} recipes`,
+      data: {
+        imported: imported.length,
+        skipped: skipped.length,
+        errors: errors.length,
+        totalRecipesInDatabase: totalRecipes,
+        details: {
+          imported: imported,
+          skipped: skipped.slice(0, 10), // Limit output
+          errors: errors.slice(0, 10)
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Seed error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to seed recipes',
+      error: error.message
+    });
+  }
+};
+
+// @route   GET /api/recipes/seed
+// @desc    Seed database with recipes from Spoonacular (GET version for easy browser access)
+// @access  Public (for development/seeding)
+router.get('/seed', seedRecipesHandler);
+
+// @route   POST /api/recipes/seed
+// @desc    Seed database with recipes from Spoonacular
+// @access  Public (for development/seeding)
+router.post('/seed', seedRecipesHandler);
 
 module.exports = router;
