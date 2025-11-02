@@ -116,9 +116,17 @@ async function quickTest() {
   }
 }
 
-// Run the test
-quickTest();
+// Only run automatically in development and browser environment
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
+  // Run the test
+  quickTest();
+  
+  console.log('\n📋 If you see a green success message, your recipes are working!');
+  console.log('📋 If you see a red error message, there\'s a connection issue.');
+  console.log('\n🔄 Try refreshing the page if recipes still don\'t show.');
+}
 
-console.log('\n📋 If you see a green success message, your recipes are working!');
-console.log('📋 If you see a red error message, there\'s a connection issue.');
-console.log('\n🔄 Try refreshing the page if recipes still don\'t show.');
+// Make function available for manual execution
+if (typeof window !== 'undefined') {
+  window.quickTest = quickTest;
+}

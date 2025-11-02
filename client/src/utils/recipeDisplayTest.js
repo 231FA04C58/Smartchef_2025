@@ -152,17 +152,22 @@ async function runAllTests() {
   console.log('If you see recipes in the popup and recipe cards on the page, everything is working!');
 }
 
-// Make functions available globally
-window.testRecipeDisplay = {
-  testRecipeAPI,
-  displayRecipes,
-  testFrontendComponents,
-  runAllTests
-};
+// Make functions available globally (only in browser)
+if (typeof window !== 'undefined') {
+  window.testRecipeDisplay = {
+    testRecipeAPI,
+    displayRecipes,
+    testFrontendComponents,
+    runAllTests
+  };
 
-console.log('\n📋 Available test functions:');
-console.log('- testRecipeDisplay.runAllTests() - Run all tests');
-console.log('- testRecipeDisplay.testRecipeAPI() - Test API only');
-console.log('- testRecipeDisplay.displayRecipes() - Show recipes popup');
-console.log('- testRecipeDisplay.testFrontendComponents() - Check frontend components');
-console.log('\n🚀 Run: testRecipeDisplay.runAllTests()');
+  // Only log in development
+  if (import.meta.env.DEV) {
+    console.log('\n📋 Available test functions:');
+    console.log('- testRecipeDisplay.runAllTests() - Run all tests');
+    console.log('- testRecipeDisplay.testRecipeAPI() - Test API only');
+    console.log('- testRecipeDisplay.displayRecipes() - Show recipes popup');
+    console.log('- testRecipeDisplay.testFrontendComponents() - Check frontend components');
+    console.log('\n🚀 Run: testRecipeDisplay.runAllTests()');
+  }
+}

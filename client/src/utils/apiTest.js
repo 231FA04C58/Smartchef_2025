@@ -54,12 +54,17 @@ const testAPI = {
   }
 };
 
-// Make available globally for browser console
-window.testAPI = testAPI;
-
-console.log('🔧 API Test functions loaded. Use:');
-console.log('- testAPI.testConnection()');
-console.log('- testAPI.testForgotPassword("your-email@example.com")');
-console.log('- testAPI.testLogin("email@example.com", "password")');
+// Make available globally for browser console (only in browser)
+if (typeof window !== 'undefined') {
+  window.testAPI = testAPI;
+  
+  // Only log in development
+  if (import.meta.env.DEV) {
+    console.log('🔧 API Test functions loaded. Use:');
+    console.log('- testAPI.testConnection()');
+    console.log('- testAPI.testForgotPassword("your-email@example.com")');
+    console.log('- testAPI.testLogin("email@example.com", "password")');
+  }
+}
 
 export default testAPI;

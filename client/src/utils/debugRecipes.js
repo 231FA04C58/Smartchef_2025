@@ -60,11 +60,19 @@ async function debugRecipes() {
   }
 }
 
-// Run the debug
-debugRecipes();
+// Only run automatically in development and browser environment
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
+  // Run the debug
+  debugRecipes();
+  
+  console.log('\n📋 Debug Instructions:');
+  console.log('1. Open your browser console (F12)');
+  console.log('2. Go to http://localhost:5173');
+  console.log('3. Run this script to see what\'s happening');
+  console.log('4. Check the console output for any errors');
+}
 
-console.log('\n📋 Debug Instructions:');
-console.log('1. Open your browser console (F12)');
-console.log('2. Go to http://localhost:5173');
-console.log('3. Run this script to see what\'s happening');
-console.log('4. Check the console output for any errors');
+// Make function available for manual execution
+if (typeof window !== 'undefined') {
+  window.debugRecipes = debugRecipes;
+}

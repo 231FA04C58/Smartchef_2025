@@ -2,9 +2,6 @@
 // Run this in your browser console to test the application
 import { API_BASE_URL } from '../config/api';
 
-console.log('🧪 SmartChef Test Script');
-console.log('========================');
-
 // Test 1: API Connection
 async function testConnection() {
   try {
@@ -96,17 +93,24 @@ async function runTests() {
   console.log('Your SmartChef application is working correctly!');
 }
 
-// Make functions available globally
-window.testSmartChef = {
-  testConnection,
-  testRegistration,
-  testLogin,
-  runTests
-};
+// Make functions available globally (only in browser)
+if (typeof window !== 'undefined') {
+  window.testSmartChef = {
+    testConnection,
+    testRegistration,
+    testLogin,
+    runTests
+  };
 
-console.log('\n📋 Available test functions:');
-console.log('- testSmartChef.runTests() - Run all tests');
-console.log('- testSmartChef.testConnection() - Test API connection');
-console.log('- testSmartChef.testRegistration() - Test user registration');
-console.log('- testSmartChef.testLogin(email, password) - Test user login');
-console.log('\n🚀 Run: testSmartChef.runTests()');
+  // Only log in development
+  if (import.meta.env.DEV) {
+    console.log('🧪 SmartChef Test Script');
+    console.log('========================');
+    console.log('\n📋 Available test functions:');
+    console.log('- testSmartChef.runTests() - Run all tests');
+    console.log('- testSmartChef.testConnection() - Test API connection');
+    console.log('- testSmartChef.testRegistration() - Test user registration');
+    console.log('- testSmartChef.testLogin(email, password) - Test user login');
+    console.log('\n🚀 Run: testSmartChef.runTests()');
+  }
+}

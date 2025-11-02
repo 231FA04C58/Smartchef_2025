@@ -71,11 +71,19 @@ async function testRecipes() {
   }
 }
 
-// Run the test
-testRecipes();
+// Only run automatically in development and browser environment
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
+  // Run the test
+  testRecipes();
+  
+  console.log('\n📋 Instructions:');
+  console.log('1. If you see a GREEN success message → Your recipes are working!');
+  console.log('2. If you see a RED error message → There\'s still a connection issue');
+  console.log('3. Check your frontend at http://localhost:5173');
+  console.log('4. The recipes should now display properly on the home page');
+}
 
-console.log('\n📋 Instructions:');
-console.log('1. If you see a GREEN success message → Your recipes are working!');
-console.log('2. If you see a RED error message → There\'s still a connection issue');
-console.log('3. Check your frontend at http://localhost:5173');
-console.log('4. The recipes should now display properly on the home page');
+// Make function available for manual execution
+if (typeof window !== 'undefined') {
+  window.testRecipes = testRecipes;
+}
