@@ -1,10 +1,12 @@
 // Debug Recipe Display - Run this in browser console
+import { API_BASE_URL } from '../config/api';
+
 console.log('🔍 Debugging Recipe Display...');
 
 async function debugRecipes() {
   try {
     console.log('1. Testing API connection...');
-    const response = await fetch('http://localhost:5000/api/recipes?limit=6');
+    const response = await fetch(`${API_BASE_URL}/recipes?limit=6`);
     const data = await response.json();
     
     console.log('2. API Response:', data);
@@ -54,7 +56,7 @@ async function debugRecipes() {
     
   } catch (error) {
     console.error('❌ Connection Error:', error.message);
-    console.log('💡 Make sure your backend is running on port 5000');
+    console.log(`💡 Make sure your backend is running on ${API_BASE_URL}`);
   }
 }
 

@@ -66,7 +66,8 @@ const Planner = () => {
       
       // More specific error messages
       if (err.message && err.message.includes('fetch')) {
-        setError('Cannot connect to backend server. Make sure it\'s running on https://smartchef-2025.onrender.com')
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com';
+        setError(`Cannot connect to backend server. Make sure it's running on ${API_BASE_URL}`)
       } else if (err.message) {
         setError(`Error: ${err.message}`)
       } else {

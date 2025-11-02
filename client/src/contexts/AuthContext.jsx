@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { API_BASE_URL } from '../config/api'
 
 const AuthContext = createContext()
 
@@ -15,8 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Use environment variable or default to Render URL
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com/api'
+  // Use environment variable from config (imported at top)
 
   useEffect(() => {
     // Check for existing user in localStorage

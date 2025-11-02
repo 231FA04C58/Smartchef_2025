@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { generateAIRecipe } from '../services/aiRecipeService';
+import { API_BASE_URL } from '../config/api';
 
 const AIGenerator = () => {
   const [prompt, setPrompt] = useState('');
@@ -109,7 +110,6 @@ const AIGenerator = () => {
         return;
       }
 
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com/api';
       const response = await fetch(`${API_BASE_URL}/recipes`, {
         method: 'POST',
         headers: {

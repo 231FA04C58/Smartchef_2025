@@ -1,10 +1,12 @@
 // Quick Recipe Test - Run this in your browser console
+import { API_BASE_URL } from '../config/api';
+
 console.log('🍳 Testing Recipe Display...');
 
 async function testRecipes() {
   try {
     // Test API connection
-    const response = await fetch('http://localhost:5000/api/recipes');
+    const response = await fetch(`${API_BASE_URL}/recipes`);
     const data = await response.json();
     
     if (data.success) {

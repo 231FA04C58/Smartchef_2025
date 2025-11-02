@@ -60,7 +60,8 @@ export const getRecipes = async (params = {}) => {
     console.error('   Error message:', error.message);
     
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      const detailedError = new Error('Unable to connect to backend server at https://smartchef-2025.onrender.com. Please make sure:\n1. Backend server is running\n2. No firewall is blocking the connection\n3. MongoDB is running');
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com';
+      const detailedError = new Error(`Unable to connect to backend server at ${API_BASE_URL}. Please make sure:\n1. Backend server is running\n2. No firewall is blocking the connection\n3. MongoDB is running`);
       detailedError.originalError = error;
       throw detailedError;
     }

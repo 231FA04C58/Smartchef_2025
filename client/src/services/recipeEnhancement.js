@@ -1,4 +1,5 @@
 // Recipe Enhancement Service - Pulls real data from Google APIs
+import { API_BASE_URL } from '../config/api';
 const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY'; // You'll need to get this from Google Cloud Console
 const UNSPLASH_API_KEY = 'YOUR_UNSPLASH_API_KEY'; // Free API key from Unsplash
 
@@ -384,7 +385,6 @@ export const loadEnhancedRecipes = async () => {
     const enhancedRecipes = getEnhancedRecipeData();
     
     for (const recipe of enhancedRecipes) {
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartchef-2025.onrender.com/api';
       const response = await fetch(`${API_BASE_URL}/recipes`, {
         method: 'POST',
         headers: {

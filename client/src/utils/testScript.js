@@ -1,5 +1,6 @@
 // Test Script for SmartChef Application
 // Run this in your browser console to test the application
+import { API_BASE_URL } from '../config/api';
 
 console.log('🧪 SmartChef Test Script');
 console.log('========================');
@@ -7,7 +8,7 @@ console.log('========================');
 // Test 1: API Connection
 async function testConnection() {
   try {
-    const response = await fetch('http://localhost:5000/api/health');
+    const response = await fetch(`${API_BASE_URL}/health`);
     const data = await response.json();
     console.log('✅ Backend API is running:', data.message);
     return true;
@@ -28,7 +29,7 @@ async function testRegistration() {
   };
 
   try {
-    const response = await fetch('http://localhost:5000/api/auth/register', {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(testUser)
@@ -52,7 +53,7 @@ async function testRegistration() {
 // Test 3: User Login
 async function testLogin(email, password) {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/login', {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })

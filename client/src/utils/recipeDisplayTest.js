@@ -1,4 +1,6 @@
 // Test Recipe Display - Run this in your browser console
+import { API_BASE_URL } from '../config/api';
+
 console.log('🧪 Testing Recipe Display from Database');
 console.log('=====================================');
 
@@ -6,7 +8,7 @@ console.log('=====================================');
 async function testRecipeAPI() {
   try {
     console.log('📡 Fetching recipes from API...');
-    const response = await fetch('http://localhost:5000/api/recipes');
+    const response = await fetch(`${API_BASE_URL}/recipes`);
     const data = await response.json();
     
     if (data.success) {
