@@ -7,31 +7,45 @@ class EmailService {
   }
 
   initializeTransporter() {
-    // Gmail SMTP configuration
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER || 'harikag762@gmail.com',
-        pass: process.env.SMTP_PASS || 'wajjsjjgresjhpze'
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
+    // Gmail SMTP configuration - Use EMAIL_USER/EMAIL_PASS or fallback to SMTP_USER/SMTP_PASS
+    const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
+    const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
 
-    // Verify connection configuration
-    this.transporter.verify((error, success) => {
-      if (error) {
-        console.log('❌ Email service configuration error:', error);
-      } else {
-        console.log('✅ Email service is ready to send messages');
-      }
-    });
+    // Only create transporter if credentials are available
+    if (emailUser && emailPass) {
+      this.transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: emailUser,
+          pass: emailPass,
+        },
+      });
+
+      // Verify connection configuration (non-blocking, wrapped in try/catch)
+      this.transporter.verify((error, success) => {
+        if (error) {
+          console.log('❌ Email service configuration error:', error.message);
+          console.log('⚠️ Email functionality will be disabled until configured properly');
+        } else {
+          console.log('✅ Email service is ready to send messages');
+        }
+      });
+    } else {
+      console.log('⚠️ Email service not configured: EMAIL_USER and EMAIL_PASS not set');
+      console.log('⚠️ Email functionality will be disabled');
+    }
   }
 
   async sendOTPEmail(email, otp, type = 'password-reset') {
+    // Check if transporter is available
+    if (!this.transporter) {
+      console.warn('⚠️ Email service not configured, skipping email send');
+      return {
+        success: false,
+        error: 'Email service not configured'
+      };
+    }
+
     try {
       let subject, htmlContent;
 
@@ -322,6 +336,15 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(email, resetLink, resetToken) {
+    // Check if transporter is available
+    if (!this.transporter) {
+      console.warn('⚠️ Email service not configured, skipping email send');
+      return {
+        success: false,
+        error: 'Email service not configured'
+      };
+    }
+
     try {
       const subject = 'SmartChef - Reset Your Password';
       const htmlContent = this.getPasswordResetLinkTemplate(resetLink);
@@ -358,6 +381,15 @@ class EmailService {
   }
 
   async sendWelcomeEmail(email, username) {
+    // Check if transporter is available
+    if (!this.transporter) {
+      console.warn('⚠️ Email service not configured, skipping email send');
+      return {
+        success: false,
+        error: 'Email service not configured'
+      };
+    }
+
     try {
       const htmlContent = `
         <!DOCTYPE html>

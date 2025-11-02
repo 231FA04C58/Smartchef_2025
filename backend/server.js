@@ -25,47 +25,25 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration
-const isDevelopment = process.env.NODE_ENV !== 'production';
-const allowedOrigins = [];
+// ✅ CORS configuration - Allow both local and deployed frontend URLs
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://smartchef-2025-frontend.onrender.com",
+];
 
-// Add production frontend URL if set
-if (process.env.FRONTEND_URL) {
-  // Support comma-separated multiple URLs
-  const urls = process.env.FRONTEND_URL.split(',').map(url => url.trim());
-  allowedOrigins.push(...urls);
-}
-
-// Add localhost origins for development
-if (isDevelopment) {
-  allowedOrigins.push(
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://localhost:3000'
-  );
-}
-
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, Postman, or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // In development, allow all origins for easier testing
-    if (isDevelopment && allowedOrigins.length === 0) {
-      return callback(null, true);
-    }
-    
-    // Check if origin is in allowed list
-    if (allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.warn(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      console.log("CORS blocked origin:", origin);
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true
-}));
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
