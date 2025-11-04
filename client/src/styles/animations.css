@@ -423,6 +423,33 @@ input[type="search"]:focus {
   animation: spin 1s linear infinite;
 }
 
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+/* Full-screen loading container (for route-level loading) */
+body > .loading-container,
+.Layout > .loading-container {
+  min-height: calc(100vh - 200px);
+}
+
+.loading-container .spinner {
+  margin-bottom: 1rem;
+}
+
+.loading-container p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
 /* Pulse Animation for Interactive Elements */
 @keyframes pulse {
   0%, 100% {

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { getIngredientName } from '../utils/ingredientHelper';
 
 const RecipeScaling = ({ recipe, onServingsChange }) => {
   const [servings, setServings] = useState(recipe.servings || 4);
@@ -82,11 +83,14 @@ const RecipeScaling = ({ recipe, onServingsChange }) => {
       <div className="scaled-ingredients">
         <h3>Ingredients (for {servings} servings):</h3>
         <ul>
-          {recipe.ingredients?.map((ingredient, index) => (
-            <li key={index}>
-              <strong>{scaleIngredient(ingredient.amount)} {ingredient.unit}</strong> {ingredient.name}
-            </li>
-          ))}
+          {recipe.ingredients?.map((ingredient, index) => {
+            const ingredientName = getIngredientName(ingredient, index);
+            return (
+              <li key={index}>
+                <strong>{scaleIngredient(ingredient.amount)} {ingredient.unit}</strong> {ingredientName}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

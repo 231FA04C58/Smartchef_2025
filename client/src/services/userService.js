@@ -67,6 +67,38 @@ export const getUserStats = async () => {
   }
 };
 
+// Update user profile
+export const updateUserProfile = async (profileData) => {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(profileData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const error = new Error(errorData.message || 'Failed to update profile');
+      error.status = response.status;
+      
+      if (handleApiError(error)) {
+        throw error;
+      }
+      
+      throw error;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Update profile error:', error);
+    throw error;
+  }
+};
+
 // Update user preferences
 export const updateUserPreferences = async (preferences) => {
   try {

@@ -427,6 +427,9 @@
   body {
     background: white;
   }
+
+  /* Note: Shopping list print styles are handled in index.css */
+  /* This prevents conflicts when printing from the planner page */
 }
 
 /* Recipe Scaling */

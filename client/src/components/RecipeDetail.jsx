@@ -7,6 +7,7 @@ import RecipeScaling from './RecipeScaling';
 import RecipePrintView from './RecipePrintView';
 import CookMode from './CookMode';
 import NutritionEditor from './NutritionEditor';
+import { getIngredientName } from '../utils/ingredientHelper';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -312,6 +313,26 @@ const RecipeDetail = () => {
           {/* Recipe Actions */}
           <div className="recipe-actions-bar">
             <button 
+              onClick={handleFavoriteToggle}
+              className={`btn ${isFavorite ? 'btn-primary' : 'btn-outline'}`}
+              title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+            >
+              <i className={`fas fa-heart ${isFavorite ? 'solid' : 'regular'}`}></i>
+              {isFavorite ? ' Remove from Favorites' : ' Add to Favorites'}
+            </button>
+            {(user || currentUser) && (
+              <button 
+                onClick={() => {
+                  setActiveTab('reviews');
+                  setShowReviewForm(true);
+                }}
+                className="btn btn-outline"
+                title="Write a Review"
+              >
+                <i className="fas fa-star"></i> Write Review
+              </button>
+            )}
+            <button 
               onClick={() => setShowCookMode(true)}
               className="btn btn-primary"
             >
@@ -388,11 +409,25 @@ const RecipeDetail = () => {
                   const scaledAmount = ingredient.amount && typeof ingredient.amount === 'string' && ingredient.amount !== 'to taste'
                     ? (parseFloat(ingredient.amount) * multiplier).toFixed(2)
                     : ingredient.amount;
+                  
+                  // Get ingredient name using helper function
+                  const ingredientName = getIngredientName(ingredient, index);
+                  
+                  // Build display string
+                  let displayText = '';
+                  if (scaledAmount && scaledAmount !== 'to taste' && scaledAmount !== '0') {
+                    displayText = `${scaledAmount} ${ingredient.unit || ''} ${ingredientName}`.trim();
+                  } else if (ingredient.amount === 'to taste' || scaledAmount === 'to taste') {
+                    displayText = `${ingredientName} (to taste)`;
+                  } else {
+                    displayText = ingredientName;
+                  }
+                  
                   return (
                     <li key={index} className="ingredient-item">
                       <input type="checkbox" id={`ingredient-${index}`} />
                       <label htmlFor={`ingredient-${index}`}>
-                        {scaledAmount} {ingredient.unit || ''} {ingredient.name}
+                        {displayText}
                       </label>
                     </li>
                   );
@@ -409,7 +444,7 @@ const RecipeDetail = () => {
                   <div key={index} className="instruction-step">
                     <div className="step-number">{index + 1}</div>
                     <div className="step-content">
-                      <p>{typeof instruction === 'string' ? instruction : instruction.instruction}</p>
+                      <p>{typeof instruction === 'string' ? instruction : (instruction.instruction || instruction.step || instruction.text || '')}</p>
                       {(instruction.duration > 0 || (typeof instruction === 'string' && instruction.includes('minutes'))) && (
                         <button 
                           onClick={() => {
@@ -620,27 +655,45 @@ const RecipeDetail = () => {
               )}
 
               <div className="reviews-list">
-                {recipe.reviews?.map((review, index) => (
-                  <div key={index} className="review-item">
-                    <div className="review-header">
-                      <div className="reviewer-info">
-                        <span className="reviewer-name">{review.user?.name || 'Anonymous'}</span>
-                        <div className="review-rating">
-                          {[1, 2, 3, 4, 5].map(star => (
-                            <i 
-                              key={star}
-                              className={`fas fa-star ${star <= review.rating ? 'filled' : ''}`}
-                            ></i>
-                          ))}
+                {recipe.reviews && recipe.reviews.length > 0 ? (
+                  recipe.reviews.map((review, index) => (
+                    <div key={index} className="review-item">
+                      <div className="review-header">
+                        <div className="reviewer-info">
+                          <span className="reviewer-name">{review.user?.name || review.user?.username || 'Anonymous'}</span>
+                          <div className="review-rating">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <i 
+                                key={star}
+                                className={`fas fa-star ${star <= review.rating ? 'filled' : ''}`}
+                              ></i>
+                            ))}
+                          </div>
                         </div>
+                        <span className="review-date">
+                          {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recently'}
+                        </span>
                       </div>
-                      <span className="review-date">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
+                      {review.comment && (
+                        <p className="review-comment">{review.comment}</p>
+                      )}
                     </div>
-                    <p className="review-comment">{review.comment}</p>
+                  ))
+                ) : (
+                  <div className="no-reviews">
+                    <i className="fas fa-comment-slash"></i>
+                    <p>No reviews yet. Be the first to review this recipe!</p>
+                    {(!user && !currentUser) && (
+                      <button 
+                        onClick={() => navigate('/login')}
+                        className="btn btn-primary"
+                        style={{marginTop: '1rem'}}
+                      >
+                        <i className="fas fa-sign-in-alt"></i> Login to Write Review
+                      </button>
+                    )}
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}

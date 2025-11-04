@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { getIngredientName } from '../utils/ingredientHelper';
 
 const RecipePrintView = ({ recipe }) => {
   const printRef = useRef(null);
@@ -84,11 +85,14 @@ const RecipePrintView = ({ recipe }) => {
         <div className="section">
           <h2><i className="fas fa-list"></i> Ingredients</h2>
           <ul className="ingredients-list">
-            {recipe.ingredients?.map((ingredient, index) => (
-              <li key={index}>
-                <strong>{ingredient.amount} {ingredient.unit}</strong> {ingredient.name}
-              </li>
-            ))}
+            {recipe.ingredients?.map((ingredient, index) => {
+              const ingredientName = getIngredientName(ingredient, index);
+              return (
+                <li key={index}>
+                  <strong>{ingredient.amount} {ingredient.unit}</strong> {ingredientName}
+                </li>
+              );
+            })}
           </ul>
         </div>
 

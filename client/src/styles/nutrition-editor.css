@@ -171,6 +171,48 @@
 }
 
 /* Review Form Enhancements */
+.no-reviews {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.no-reviews i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  color: var(--primary);
+}
+
+.no-reviews p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.reviews-section {
+  margin-top: 1rem;
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.reviews-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.reviews-list {
+  margin-top: 2rem;
+}
+
 .review-form {
   background: var(--bg);
   padding: 1.5rem;

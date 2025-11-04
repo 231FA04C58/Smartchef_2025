@@ -132,6 +132,11 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const updateUser = (userData) => {
+    setCurrentUser(userData)
+    localStorage.setItem('currentUser', JSON.stringify(userData))
+  }
+
   const logout = () => {
     localStorage.removeItem('currentUser')
     localStorage.removeItem('authToken')
@@ -145,9 +150,11 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    user: currentUser, // Alias for compatibility
     login,
     signup,
     logout,
+    updateUser,
     loading,
     error,
     clearError,

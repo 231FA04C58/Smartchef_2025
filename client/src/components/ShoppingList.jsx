@@ -148,7 +148,7 @@ const ShoppingList = () => {
         <h2>
           <i className="fas fa-shopping-cart"></i> Shopping List
         </h2>
-        <div className="shopping-list-actions">
+        <div className="shopping-list-actions no-print">
           <button onClick={clearChecked} className="btn btn-outline">
             <i className="fas fa-check-square"></i> Clear Checked
           </button>

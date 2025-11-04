@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getIngredientName } from '../utils/ingredientHelper';
 
 const QuickViewModal = ({ recipe, isOpen, onClose }) => {
   const [imageError, setImageError] = useState(false);
@@ -78,11 +79,14 @@ const QuickViewModal = ({ recipe, isOpen, onClose }) => {
                   <i className="fas fa-list"></i> Ingredients
                 </h3>
                 <ul>
-                  {recipe.ingredients.slice(0, 5).map((ingredient, index) => (
-                    <li key={index}>
-                      {ingredient.amount} {ingredient.unit} {ingredient.name}
-                    </li>
-                  ))}
+                  {recipe.ingredients.slice(0, 5).map((ingredient, index) => {
+                    const ingredientName = getIngredientName(ingredient, index);
+                    return (
+                      <li key={index}>
+                        {ingredient.amount} {ingredient.unit} {ingredientName}
+                      </li>
+                    );
+                  })}
                   {recipe.ingredients.length > 5 && (
                     <li className="more-items">+{recipe.ingredients.length - 5} more ingredients</li>
                   )}

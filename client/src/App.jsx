@@ -11,6 +11,7 @@ import Planner from './pages/Planner'
 import Recipes from './pages/Recipes'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
+import EditProfile from './pages/EditProfile'
 import RecipeForm from './pages/RecipeForm'
 import RecipeDetail from './components/RecipeDetail'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -73,6 +74,11 @@ function App() {
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Layout><Profile /></Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/edit" element={
+                <ProtectedRoute>
+                  <Layout><EditProfile /></Layout>
                 </ProtectedRoute>
               } />
               <Route path="/collections" element={

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import ForgotPassword from '../components/ForgotPassword'
 
@@ -16,6 +16,43 @@ const Login = () => {
   
   const { login, signup, loading, error, clearError, setError } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const loadingRef = useRef(loading)
+
+  // Keep loading ref in sync
+  useEffect(() => {
+    loadingRef.current = loading
+  }, [loading])
+
+  // Block browser back button during loading
+  useEffect(() => {
+    if (!loading) return
+    
+    // Create a history entry to prevent back navigation
+    const currentPath = location.pathname
+    window.history.pushState({ page: 'login-loading' }, '', currentPath)
+    
+    const handlePopState = () => {
+      // Check current loading state using ref
+      if (loadingRef.current) {
+        // Prevent back navigation and restore current state
+        window.history.pushState({ page: 'login-loading' }, '', currentPath)
+      }
+    }
+    
+    window.addEventListener('popstate', handlePopState)
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [loading, location.pathname])
+
+  // If user navigates away during loading, redirect back to login
+  useEffect(() => {
+    if (loading && location.pathname !== '/login') {
+      navigate('/login', { replace: true })
+    }
+  }, [loading, location.pathname, navigate])
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -33,9 +70,11 @@ const Login = () => {
     
     try {
       await login(loginEmail, loginPassword)
-      navigate('/')
+      // Only navigate on successful login
+      navigate('/', { replace: true })
     } catch (error) {
       // Error is handled by AuthContext
+      // Stay on login page - no navigation on error
     }
   }
 
@@ -64,9 +103,11 @@ const Login = () => {
     
     try {
       await signup(signupName, signupEmail, signupPassword)
-      navigate('/')
+      // Only navigate on successful signup
+      navigate('/', { replace: true })
     } catch (error) {
       // Error is handled by AuthContext
+      // Stay on login page - no navigation on error
     }
   }
 

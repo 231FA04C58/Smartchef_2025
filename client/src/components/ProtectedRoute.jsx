@@ -5,7 +5,12 @@ const ProtectedRoute = ({ children }) => {
   const { currentUser, loading } = useAuth()
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    )
   }
 
   if (!currentUser) {
